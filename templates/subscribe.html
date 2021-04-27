@@ -1,0 +1,35 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+
+{% block title %}
+News
+{% endblock title %}
+
+{% block content %}
+<h1>Все категории</h1>
+<h2>Количество категорий {{ category|length }} </h2>
+<table>
+    <tr>
+        <td>
+            Категория
+        </td>
+        <td>
+            Подписаться
+        </td>
+    </tr>
+    {% for item in category %}
+    <tr>
+        <td>
+            {{ item.name }}
+        </td>
+        <td>
+            {% if not_subscribed %}
+           <a href="subscribe/">Подписка</a>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock content %}
+
+

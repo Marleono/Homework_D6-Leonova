@@ -1,0 +1,22 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+
+{% block title %}
+News
+{% endblock title %}
+
+{% block content %}
+<table>
+        <tr>
+            <td>
+                {{ post.title|rude }}
+            </td>
+            <td>
+                {{ post.created|date:'d M Y H:i' }}
+            </td>
+            <td>
+                {{ post.text|rude }}
+            </td>
+        </tr>
+</table>
+{% endblock content %}

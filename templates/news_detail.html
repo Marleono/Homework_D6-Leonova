@@ -1,0 +1,37 @@
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+
+{% block title %}
+News
+{% endblock title %}
+
+{% block content %}
+<h1>Все новости</h1>
+<h2>Количество новостей {{ posts|length }} </h2>
+<table>
+    <tr>
+        <td>
+            Заголовок
+        </td>
+        <td>
+            Дата публикации
+        </td>
+        <td>
+            Анонс статьи
+        </td>
+    </tr>
+    {% for post in filter.qs %}
+    <tr>
+        <td>
+            {{ post.title|rude }}
+        </td>
+        <td>
+            {{ post.created|date:'d M Y H:i' }}
+        </td>
+        <td>
+            {{ post.text|truncatechars:50 }} {{ post.text|rude }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock content%}
