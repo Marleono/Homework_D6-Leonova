@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import Posts, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView, CategoryView
-from .views import subscribe_me
+from .views import subscribe_me, unsubscribe_me
 
 
 
@@ -14,4 +14,5 @@ urlpatterns = [
     path('<int:pk>/delete/', PostDeleteView.as_view(), name='news_delete'),
     path('categories/', CategoryView.as_view(), name='subscribe'),
     path('categories/<int:cat_id>/subscribe/', subscribe_me, name='subscribe'),
+    path('categories/<int:cat_id>/unsubscribe/', unsubscribe_me, name='subscribe'),
 ]
