@@ -25,6 +25,8 @@ News
         <td>
             {% if not_subscribed %}
              <a href="/news/categories/{{item.id}}/subscribe/"> Подписка </a>
+            {% else %}
+            <a href="/news/categories/{{item.id}}/unsubscribe/"> Отписка </a>
             {% endif %}
         </td>
     </tr>
