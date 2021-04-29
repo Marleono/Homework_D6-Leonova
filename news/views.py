@@ -73,11 +73,6 @@ class CategoryView(ListView):
     queryset = Category.objects.all()
     paginate_by = 10
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['not_subscribed'] = not Category.objects.filter(name='category_id').exists()
-        return context
-
 @login_required
 def subscribe_me(request,cat_id):
     user = request.user
@@ -85,6 +80,14 @@ def subscribe_me(request,cat_id):
     if request.user not in category.subscribers.all():
         category.subscribers.add(user)
     return redirect('/news/categories/')
+
+@login_required
+def unsubscribe_me(request, cat_id):
+   user = request.user
+   category = Category.objects.get(pk=cat_id)
+   if request.user in category.subscribers.all():
+       category.subscribers.remove(user)
+   return redirect('/news/categories/')
 
 
 
