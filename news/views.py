@@ -78,13 +78,12 @@ class CategoryView(ListView):
         context['not_subscribed'] = not Category.objects.filter(name='subscribers').exists()
         return context
 
-
 @login_required
-def subscribe_me(request):
+def subscribe_me(request,cat_id):
     user = request.user
-    subscribers = Category.objects.get(id=1).subscribers.all()
-    if not Category.objects.filter(name='subscribers').exists():
-        subscribers.user_set.add(user)
+    category = Category.objects.get(pk=cat_id)
+    if request.user not in category.subscribers.all():
+        category.subscribers.add(user)
     return redirect('/')
 
 
