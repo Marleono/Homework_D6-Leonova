@@ -97,7 +97,8 @@ def mail(request):
     all_categories = new_posts.values_list('category', flat=True).distinct()
     subscribed_users = all_categories.subscribers.values_list('subscribers')
     for user in subscribed_users:
-        pass
+        user_subscr_cat = category.values_list('subscribers')
+        subscr_posts = new_posts.filter(category__in=user_subscr_cat)
 
 
 
