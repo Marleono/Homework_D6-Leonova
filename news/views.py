@@ -7,6 +7,7 @@ from .forms import PostForm
 from django.views import View
 from django.core.paginator import Paginator
 from datetime import datetime, timedelta
+from django.utils import timezone
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import Group
@@ -93,9 +94,9 @@ def unsubscribe_me(request, cat_id):
 def mail(request):
     category = Category.objects.all()
     subscribers = Category.objects.values_list('subscribers')
-    new_posts = Post.objects.filter(created__range=[datetime.now() - timedelta(weeks=1), datetime.now()])
-    all_categories = new_posts.values_list('category', flat=True).distinct()
-    subscribed_users = all_categories.subscribers.values_list('subscribers')
+    new_posts = Post.objects.filter(created__range=[timezone.now() - timedelta(weeks=1), timezone.now()])
+    week_categories = new_posts.values_list('category', flat=True).distinct()
+    subscribed_users = User.objects.filter(category__in=week_categories)
     for user in subscribed_users:
         user_subscr_cat = category.values_list('subscribers')
         subscr_posts = new_posts.filter(category__in=user_subscr_cat)
