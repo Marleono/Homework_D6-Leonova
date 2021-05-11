@@ -14,6 +14,8 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 
 
 
@@ -29,9 +31,9 @@ class Posts(ListView):
 
 
 
-    def get_context_data(self, **kwargs): # забираем отфильтрованные объекты переопределяя метод get_context_data у наследуемого класса (привет полиморфизм, мы скучали!!!)
+    def get_context_data(self, **kwargs): 
         context = super().get_context_data(**kwargs)
-        context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset()) # вписываем наш фильтр в контекст
+        context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset()) 
         return context
 
 
@@ -98,8 +100,20 @@ def mail(request):
     week_categories = new_posts.values_list('category', flat=True).distinct()
     subscribed_users = User.objects.filter(category__in=week_categories)
     for user in subscribed_users:
-        user_subscr_cat = category.values_list('subscribers')
-        subscr_posts = new_posts.filter(category__in=user_subscr_cat)
+        html_content = render_to_string(
+            'news_detail.html',
+            {
+                'post': new_posts,
+            }
+        )
+        msg = EmailMultiAlternatives(
+            subject=f'{new_posts.title}',
+            message=f'«Здравствуй, {subscribed_users.name}. 
+            from_email='test_user_python@mail.ru'
+        )
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()  
+        return redirect('/')
 
 
 
