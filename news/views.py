@@ -16,6 +16,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
+from django.utils.decorators import method_decorator
 
 
 
@@ -41,7 +42,8 @@ class Posts(ListView):
 class PostDetailView(DetailView):
     template_name = 'news_detail.html'
     queryset = Post.objects.all()
-
+    
+@method_decorator(login_required, name='dispatch')
 class PostCreateView(CreateView):
     template_name = 'news_add.html'
     form_class = PostForm
@@ -52,19 +54,21 @@ class PostUpdateView(UpdateView):
     form_class = PostForm
 
     # метод get_object мы используем вместо queryset, чтобы получить информацию об объекте который мы собираемся редактировать
+    @method_decorator(login_required)
     def get_object(self, **kwargs):
         id = self.kwargs.get('pk')
         return Post.objects.get(pk=id)
 
 
 # дженерик для удаления товара
+@method_decorator(login_required, name='dispatch')
 class PostDeleteView(DeleteView):
     template_name = 'news_delete.html'
     queryset = Post.objects.all()
     success_url = '/news/'
 
 
-
+@method_decorator(login_required, name='dispatch')
 class AddPost(PermissionRequiredMixin, CreateView):
     permission_required = ('news.news_add', 'news.news_delete')
 
@@ -92,28 +96,7 @@ def unsubscribe_me(request, cat_id):
        category.subscribers.remove(user)
    return redirect('/news/categories/')
 
-@login_required
-def mail(request):
-    category = Category.objects.all()
-    subscribers = Category.objects.values_list('subscribers')
-    new_posts = Post.objects.filter(created__range=[timezone.now() - timedelta(weeks=1), timezone.now()])
-    week_categories = new_posts.values_list('category', flat=True).distinct()
-    subscribed_users = User.objects.filter(category__in=week_categories)
-    for user in subscribed_users:
-        html_content = render_to_string(
-            'news_detail.html',
-            {
-                'post': new_posts,
-            }
-        )
-        msg = EmailMultiAlternatives(
-            subject=f'{new_posts.title}',
-            message=f'«Здравствуй, {subscribed_users.name}. 
-            from_email='test_user_python@mail.ru'
-        )
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()  
-        return redirect('/')
+
 
 
 
