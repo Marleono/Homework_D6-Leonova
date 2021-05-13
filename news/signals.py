@@ -7,7 +7,8 @@ from django.utils import timezone
 
 
 
-def notify_subscribers_news(request, sender, instance, created, **kwargs):
+@receiver(post_save, sender=Post)
+def notification_mail(sender, created, **kwargs):
     categories = Category.objects.all()
     subscribers = Category.objects.values_list('subscribers')
     new_posts = Post.objects.filter(created__range=[timezone.now() - timedelta(weeks=1), timezone.now()])
@@ -15,12 +16,11 @@ def notify_subscribers_news(request, sender, instance, created, **kwargs):
     subscribed_users = User.objects.filter(category__in=week_categories)
     for user in subscribed_users:
             if created:
-                subject = f'{instance.username} {instance.date.strftime("%d %m %Y")}'
+                 subject = f'{user.username}'
             else:
-                subject = f'Список новостей изменен для {instance.username} {instance.date.strftime("%d %m %Y")}'
+                 subject = f'Список новостей изменен для {user.username} '
 
             mail_managers(
                 subject=subject,
-                message=instance.message,
+                message= f'Новый пост в твоей любимой категории!',
             )
-post_save.connect(notify_subscribers_news(), sender=Post)
